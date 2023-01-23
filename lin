@@ -1,0 +1,97 @@
+
+
+
+
+
+[oracle@prodoracle1 ~]$ cat tt.sh
+
+
+#!/bin/bash
+echo " "
+echo "#################################################################"
+echo " "
+varPR=$(/home/oracle/test.sh |head -4|tail -1)
+varDR=57
+
+
+echo "on pr current sequence is $varPR"
+echo "on dr current sequence is $varDR"
+
+#!/bin/bash
+
+
+if [ $varDR == $varPR ]
+then
+                echo " "
+        echo "#################################################################"
+        echo " "
+
+        echo "database in sync"
+        srvctl status database -db orcl
+else
+        echo " "
+                echo "#################################################################"
+        echo " "
+
+        echo "database not in sync"
+fi
+echo " "
+echo "#################################################################"
+echo " "
+
+
+
+varSwitch=$(/home/oracle/verify.sh|head -2|tail -1)
+
+if [ "$varSwitch" == "System altered." ]
+then
+        echo " "
+        echo "#################################################################"
+        echo " "
+        echo $varSwitch
+        echo " "
+        echo "you can switch db "
+else
+        echo " "
+        echo "#################################################################"
+        echo " "
+        echo $varSwitch
+        echo " "
+        echo "you can not switch db "
+
+fi
+echo " "
+echo "#################################################################"
+echo " "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[oracle@prodoracle1 ~]$ cat /home/oracle/verify.sh
+sqlplus -s  / as sysdba <<EOF
+alter system register;
+EOF
+exit
+[oracle@prodoracle1 ~]$
+[oracle@prodoracle1 ~]$ cat /home/oracle/test.sh
+va='v$archived_log'
+sqlplus -s  / as sysdba <<EOF
+select max(sequence#) from v\$archived_log;
+EOF
+exit
